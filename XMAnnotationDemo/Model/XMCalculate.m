@@ -75,7 +75,7 @@
     return resultVector;
 }
 
-+ (XMVector *)invertMatrix:(XMMatrix *)a
++ (XMMatrix *)invertMatrix:(XMMatrix *)a
 {
     int a00 = [a.matrixArray[0] intValue];
     int a01 = [a.matrixArray[1] intValue];

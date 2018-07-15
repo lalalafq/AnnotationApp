@@ -24,7 +24,7 @@
 		C341727F20F7803A008F2954 /* UIImage+Utilitly.m in Sources */ = {isa = PBXBuildFile; fileRef = C341727E20F78039008F2954 /* UIImage+Utilitly.m */; };
 		C3D830BF20F8A4AB00671993 /* NSObject+Runtime.m in Sources */ = {isa = PBXBuildFile; fileRef = C3D830BE20F8A4AB00671993 /* NSObject+Runtime.m */; };
 		C3D830C220F9C53600671993 /* NSArray+Safety.m in Sources */ = {isa = PBXBuildFile; fileRef = C3D830C120F9C53600671993 /* NSArray+Safety.m */; };
-		C3D830C820F9C72C00671993 /* NSString+RectSize.m in Sources */ = {isa = PBXBuildFile; fileRef = C3D830C720F9C72C00671993 /* NSString+RectSize.m */; };
+		C3D830CB20FAE58500671993 /* NSString+RectSize.m in Sources */ = {isa = PBXBuildFile; fileRef = C3D830C920FAE58500671993 /* NSString+RectSize.m */; };
 		C3F417B620AD7ED80036B3A7 /* XMAnnotationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = C3F417B520AD7ED80036B3A7 /* XMAnnotationInfo.m */; };
 		C3F417BD20AE6B960036B3A7 /* XMMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = C3F417BC20AE6B960036B3A7 /* XMMatrix.m */; };
 		C3F417C020AE6BA60036B3A7 /* XMVector.m in Sources */ = {isa = PBXBuildFile; fileRef = C3F417BF20AE6BA60036B3A7 /* XMVector.m */; };
@@ -84,8 +84,8 @@
 		C3D830BE20F8A4AB00671993 /* NSObject+Runtime.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSObject+Runtime.m"; sourceTree = "<group>"; };
 		C3D830C020F9C53600671993 /* NSArray+Safety.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+Safety.h"; sourceTree = "<group>"; };
 		C3D830C120F9C53600671993 /* NSArray+Safety.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSArray+Safety.m"; sourceTree = "<group>"; };
-		C3D830C620F9C72C00671993 /* NSString+RectSize.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+RectSize.h"; sourceTree = "<group>"; };
-		C3D830C720F9C72C00671993 /* NSString+RectSize.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+RectSize.m"; sourceTree = "<group>"; };
+		C3D830C920FAE58500671993 /* NSString+RectSize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+RectSize.m"; sourceTree = "<group>"; };
+		C3D830CA20FAE58500671993 /* NSString+RectSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+RectSize.h"; sourceTree = "<group>"; };
 		C3F417B420AD7ED80036B3A7 /* XMAnnotationInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XMAnnotationInfo.h; sourceTree = "<group>"; };
 		C3F417B520AD7ED80036B3A7 /* XMAnnotationInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XMAnnotationInfo.m; sourceTree = "<group>"; };
 		C3F417BA20AE67010036B3A7 /* Constant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constant.h; sourceTree = "<group>"; };
@@ -157,6 +157,7 @@
 		C309804D20AC2D7500328B67 /* XMAnnotationDemo */ = {
 			isa = PBXGroup;
 			children = (
+				C3D830CC20FAE59D00671993 /* Header */,
 				C3D830C520F9C5E900671993 /* Model */,
 				C3D830C420F9C59F00671993 /* Component */,
 				C3D830C320F9C57800671993 /* VC */,
@@ -168,8 +169,6 @@
 				C309805920AC2D7500328B67 /* LaunchScreen.storyboard */,
 				C309805C20AC2D7500328B67 /* Info.plist */,
 				C309805D20AC2D7500328B67 /* main.m */,
-				C309808320AD111700328B67 /* prefixHeader.h */,
-				C3F417BA20AE67010036B3A7 /* Constant.h */,
 			);
 			path = XMAnnotationDemo;
 			sourceTree = "<group>";
@@ -195,6 +194,8 @@
 		C341727C20F78006008F2954 /* Category */ = {
 			isa = PBXGroup;
 			children = (
+				C3D830CA20FAE58500671993 /* NSString+RectSize.h */,
+				C3D830C920FAE58500671993 /* NSString+RectSize.m */,
 				C309808A20AD15C000328B67 /* UIBarButtonItem+CustomStyle.h */,
 				C309808B20AD15C000328B67 /* UIBarButtonItem+CustomStyle.m */,
 				C341727D20F78039008F2954 /* UIImage+Utilitly.h */,
@@ -203,8 +204,6 @@
 				C3D830BE20F8A4AB00671993 /* NSObject+Runtime.m */,
 				C3D830C020F9C53600671993 /* NSArray+Safety.h */,
 				C3D830C120F9C53600671993 /* NSArray+Safety.m */,
-				C3D830C620F9C72C00671993 /* NSString+RectSize.h */,
-				C3D830C720F9C72C00671993 /* NSString+RectSize.m */,
 			);
 			path = Category;
 			sourceTree = "<group>";
@@ -246,6 +245,15 @@
 				C3F417D320AEA7260036B3A7 /* XMCalculate.m */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		C3D830CC20FAE59D00671993 /* Header */ = {
+			isa = PBXGroup;
+			children = (
+				C309808320AD111700328B67 /* prefixHeader.h */,
+				C3F417BA20AE67010036B3A7 /* Constant.h */,
+			);
+			path = Header;
 			sourceTree = "<group>";
 		};
 		E3A7856F5416BC3883C67915 /* Pods */ = {
@@ -495,7 +503,7 @@
 				C341727F20F7803A008F2954 /* UIImage+Utilitly.m in Sources */,
 				C309808920AD156A00328B67 /* JXNavigationController.m in Sources */,
 				C309805E20AC2D7500328B67 /* main.m in Sources */,
-				C3D830C820F9C72C00671993 /* NSString+RectSize.m in Sources */,
+				C3D830CB20FAE58500671993 /* NSString+RectSize.m in Sources */,
 				C3D830C220F9C53600671993 /* NSArray+Safety.m in Sources */,
 				C309805020AC2D7500328B67 /* AppDelegate.m in Sources */,
 				C309808220AC301B00328B67 /* AnnotationViewController.m in Sources */,
