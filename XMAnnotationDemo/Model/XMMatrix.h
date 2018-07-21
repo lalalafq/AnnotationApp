@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
+
 @interface XMMatrix : NSObject
 
 @property (nonatomic,strong,readonly)NSArray<NSNumber *> * matrixArray;
@@ -18,6 +19,8 @@
 + (XMMatrix *)translateMatrixWithX:(int)dx withY:(int)dy;
 // 旋转矩阵
 + (XMMatrix *)rotateMatrix:(double)delta;
+// 以某个点做旋转 = 以原点旋转 + 转点的坐标
++ (XMMatrix *)rotateMatrix:(double)delta originPoint:(CGPoint)originPoint;
 // 缩放矩阵
 + (XMMatrix *)scaleMatrixWithX:(double)sx withY:(double)sy;
 

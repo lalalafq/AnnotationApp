@@ -37,15 +37,15 @@
     int b21 = [b.matrixArray[7] intValue];
     int b22 = [b.matrixArray[8] intValue];
     
-    int c0 = (b00 * a00) + (b01 * a10) + (b02 * a20);
-    int c1 = (b00 * a01) + (b01 * a11) + (b02 * a21);
-    int c2 = (b00 * a02) + (b01 * a12) + (b02 * a22);
-    int c3 = (b10 * a00) + (b11 * a10) + (b12 * a20);
-    int c4 = (b10 * a01) + (b11 * a11) + (b12 * a21);
-    int c5 = (b10 * a02) + (b11 * a12) + (b12 * a22);
-    int c6 = (b20 * a00) + (b21 * a10) + (b22 * a20);
-    int c7 = (b20 * a01) + (b21 * a11) + (b22 * a21);
-    int c8 = (b20 * a02) + (b21 * a12) + (b22 * a22);
+    int c0 = (a00 * b00) + (a01 * b10) + (a02 * b20);
+    int c1 = (a00 * b01) + (a01 * b11) + (a02 * b21);
+    int c2 = (a00 * b02) + (a01 * b12) + (a02 * b22);
+    int c3 = (a10 * b00) + (a11 * b10) + (a12 * b20);
+    int c4 = (a10 * b01) + (a11 * b11) + (a12 * b21);
+    int c5 = (a10 * b02) + (a11 * b12) + (a12 * b22);
+    int c6 = (a20 * b00) + (a21 * b10) + (a22 * b20);
+    int c7 = (a20 * b01) + (a21 * b11) + (a22 * b21);
+    int c8 = (a20 * b02) + (a21 * b12) + (a22 * b22);
     
     XMMatrix * resultMatrix = [[XMMatrix alloc] initWithArray:@[@(c0),@(c1),@(c2),@(c3),@(c4),@(c5),@(c6),@(c7),@(c8)]];
     return resultMatrix;

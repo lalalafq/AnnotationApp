@@ -43,4 +43,6 @@ typedef enum : NSUInteger {
 - (void)handleRight;
 - (void)handleBlank;
 
+- (void)length;
+
 @end

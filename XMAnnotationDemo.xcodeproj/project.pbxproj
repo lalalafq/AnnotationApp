@@ -22,6 +22,7 @@
 		C309808C20AD15C100328B67 /* UIBarButtonItem+CustomStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = C309808B20AD15C000328B67 /* UIBarButtonItem+CustomStyle.m */; };
 		C309808F20AD57ED00328B67 /* XMAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C309808E20AD57ED00328B67 /* XMAnnotationView.m */; };
 		C341727F20F7803A008F2954 /* UIImage+Utilitly.m in Sources */ = {isa = PBXBuildFile; fileRef = C341727E20F78039008F2954 /* UIImage+Utilitly.m */; };
+		C36E3D5A2102F0D2000C9975 /* UIImage+FixOrientation.m in Sources */ = {isa = PBXBuildFile; fileRef = C36E3D592102F0D2000C9975 /* UIImage+FixOrientation.m */; };
 		C3D830BF20F8A4AB00671993 /* NSObject+Runtime.m in Sources */ = {isa = PBXBuildFile; fileRef = C3D830BE20F8A4AB00671993 /* NSObject+Runtime.m */; };
 		C3D830C220F9C53600671993 /* NSArray+Safety.m in Sources */ = {isa = PBXBuildFile; fileRef = C3D830C120F9C53600671993 /* NSArray+Safety.m */; };
 		C3D830CB20FAE58500671993 /* NSString+RectSize.m in Sources */ = {isa = PBXBuildFile; fileRef = C3D830C920FAE58500671993 /* NSString+RectSize.m */; };
@@ -80,6 +81,8 @@
 		C309808E20AD57ED00328B67 /* XMAnnotationView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XMAnnotationView.m; sourceTree = "<group>"; };
 		C341727D20F78039008F2954 /* UIImage+Utilitly.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+Utilitly.h"; sourceTree = "<group>"; };
 		C341727E20F78039008F2954 /* UIImage+Utilitly.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Utilitly.m"; sourceTree = "<group>"; };
+		C36E3D582102F0D2000C9975 /* UIImage+FixOrientation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+FixOrientation.h"; sourceTree = "<group>"; };
+		C36E3D592102F0D2000C9975 /* UIImage+FixOrientation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+FixOrientation.m"; sourceTree = "<group>"; };
 		C3D830BD20F8A4AB00671993 /* NSObject+Runtime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSObject+Runtime.h"; sourceTree = "<group>"; };
 		C3D830BE20F8A4AB00671993 /* NSObject+Runtime.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSObject+Runtime.m"; sourceTree = "<group>"; };
 		C3D830C020F9C53600671993 /* NSArray+Safety.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+Safety.h"; sourceTree = "<group>"; };
@@ -157,6 +160,7 @@
 		C309804D20AC2D7500328B67 /* XMAnnotationDemo */ = {
 			isa = PBXGroup;
 			children = (
+				C36E3D5B2102F56B000C9975 /* QFKit */,
 				C3D830CC20FAE59D00671993 /* Header */,
 				C3D830C520F9C5E900671993 /* Model */,
 				C3D830C420F9C59F00671993 /* Component */,
@@ -204,8 +208,17 @@
 				C3D830BE20F8A4AB00671993 /* NSObject+Runtime.m */,
 				C3D830C020F9C53600671993 /* NSArray+Safety.h */,
 				C3D830C120F9C53600671993 /* NSArray+Safety.m */,
+				C36E3D582102F0D2000C9975 /* UIImage+FixOrientation.h */,
+				C36E3D592102F0D2000C9975 /* UIImage+FixOrientation.m */,
 			);
 			path = Category;
+			sourceTree = "<group>";
+		};
+		C36E3D5B2102F56B000C9975 /* QFKit */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = QFKit;
 			sourceTree = "<group>";
 		};
 		C3D830C320F9C57800671993 /* VC */ = {
@@ -504,6 +517,7 @@
 				C309808920AD156A00328B67 /* JXNavigationController.m in Sources */,
 				C309805E20AC2D7500328B67 /* main.m in Sources */,
 				C3D830CB20FAE58500671993 /* NSString+RectSize.m in Sources */,
+				C36E3D5A2102F0D2000C9975 /* UIImage+FixOrientation.m in Sources */,
 				C3D830C220F9C53600671993 /* NSArray+Safety.m in Sources */,
 				C309805020AC2D7500328B67 /* AppDelegate.m in Sources */,
 				C309808220AC301B00328B67 /* AnnotationViewController.m in Sources */,
@@ -674,7 +688,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = A472RUY7W3;
-				GCC_PREFIX_HEADER = "$(SRCROOT)/XMAnnotationDemo/prefixHeader.h";
+				GCC_PREFIX_HEADER = "$(SRCROOT)/XMAnnotationDemo/Header/prefixHeader.h";
 				INFOPLIST_FILE = XMAnnotationDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.hzxcl.XMAnnotationDemo;
@@ -690,7 +704,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = A472RUY7W3;
-				GCC_PREFIX_HEADER = "$(SRCROOT)/XMAnnotationDemo/prefixHeader.h";
+				GCC_PREFIX_HEADER = "$(SRCROOT)/XMAnnotationDemo/Header/prefixHeader.h";
 				INFOPLIST_FILE = XMAnnotationDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.hzxcl.XMAnnotationDemo;

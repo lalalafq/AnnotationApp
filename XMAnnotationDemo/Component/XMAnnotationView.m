@@ -8,6 +8,8 @@
 
 #import "XMAnnotationView.h"
 #import "XMAnnotationInfo.h"
+#import "UIImage+FixOrientation.h"
+#import <math.h>
 
 
 @interface XMAnnotationView()// 正在拖拽中的图形。
@@ -59,7 +61,8 @@
     {
         [self initCurrentBgInfo:rect];
     }
-    NSArray <XMVector *> * realPoints = [self.bgImgInfo translatePointByOperation];
+    [self.bgImgInfo reCalculateRealPoints];
+    NSArray <XMVector *> * realPoints = self.bgImgInfo.realPoints;
     CGPoint p0 = [realPoints objectAtIndex:0].getVectorPoint;
     CGPoint p2 = [realPoints objectAtIndex:2].getVectorPoint;
     CGRect imageRect = CGRectMake(MIN(p0.x , p2.x),
@@ -70,6 +73,7 @@
     //需要将CGLayerContext来作为缓存context，这个是必须的
     CGContextRef layerContext = CGLayerGetContext(cg);
     CGContextDrawImage(layerContext, imageRect, self.image.CGImage);
+//    [self.image drawInRect:imageRect];
     CGContextDrawLayerAtPoint(context, CGPointMake(0, 0), cg);
 }
 
@@ -84,7 +88,8 @@
     /// 绘制之前的框
     for (XMAnnotationInfo * info in self.graphicsArray)
     {
-        NSArray <XMVector *> * realPoints = [info translatePointByOperation];
+        [info reCalculateRealPoints];
+        NSArray <XMVector *> * realPoints = info.realPoints;
         CGPoint p0 = [realPoints objectAtIndex:0].getVectorPoint;
         CGPoint p1 = [realPoints objectAtIndex:1].getVectorPoint;
         CGPoint p2 = [realPoints objectAtIndex:2].getVectorPoint;
@@ -100,7 +105,8 @@
     
     /// 绘制正在过拽的框
     CGContextSetStrokeColorWithColor(context, [UIColor redColor].CGColor);
-    NSArray <XMVector *> * realPoints = [self.draggingInfo translatePointByOperation];
+    [self.draggingInfo reCalculateRealPoints];
+    NSArray <XMVector *> * realPoints = self.draggingInfo.realPoints;
     CGPoint p0 = [realPoints objectAtIndex:0].getVectorPoint;
     CGPoint p1 = [realPoints objectAtIndex:1].getVectorPoint;
     CGPoint p2 = [realPoints objectAtIndex:2].getVectorPoint;
@@ -120,7 +126,14 @@
     UITouch *touch = [touches anyObject];
     CGPoint touchPoint = [touch locationInView:self];
     XMVector * pointVector = [[XMVector alloc] initWithPoint:touchPoint];
-    NSLog(@"*******************触碰开始*******************%@",NSStringFromCGPoint(touchPoint));
+    NSLog(@"*******************触碰开始*******************%@:%@",NSStringFromCGPoint(touchPoint),@(touches.count));
+    
+    if (touches.count == 2)
+    {
+        self.draggingOriginPoint = touchPoint;
+        return;
+    }
+    
     
     //
     if (self.annotationType == AnnotationTypeDraw)
@@ -148,8 +161,16 @@
         {
             [self.bgImgInfo.operationMatrix safetyAddObject:m];
         }
-        
-        
+    }
+    else if (self.annotationType == AnnotationTypeScale)
+    {
+    }
+    else if (self.annotationType == AnnotationTypeErasure)
+    {
+        [self findLocateRect:touchPoint];
+        [self.graphicsArray safetyRemoveObject:self.draggingInfo];
+        self.draggingInfo = nil;
+        [self setNeedsDisplay];
     }
 }
 
@@ -158,7 +179,26 @@
     UITouch *touch = [touches anyObject];
     CGPoint touchPoint = [touch locationInView:self];
     XMVector * pointVector = [[XMVector alloc] initWithPoint:touchPoint];
-    NSLog(@"*******************触碰移动*******************%@",NSStringFromCGPoint(touchPoint));
+    NSLog(@"*******************触碰移动*******************%@:%@",NSStringFromCGPoint(touchPoint),@(touches.count));
+    
+    if (touches.count == 2)
+    {
+        CGFloat dx = touchPoint.x - self.draggingOriginPoint.x;
+        CGFloat dy = touchPoint.y - self.draggingOriginPoint.y;
+        CGFloat diagonal = sqrt(dx*dx + dy*dy);
+        CGFloat sWidth = [[UIScreen mainScreen] bounds].size.width;
+        CGFloat sHeight = [[UIScreen mainScreen] bounds].size.height;
+        CGFloat screenDiagonal = sqrt(sWidth*sWidth + sHeight*sHeight);
+        CGFloat scale = diagonal / screenDiagonal;
+        
+        XMMatrix * m = [XMMatrix scaleMatrixWithX:scale withY:scale];
+        [self.bgImgInfo.operationMatrix safetyRemoveObjectAtIndex:self.bgImgInfo.operationMatrix.count - 1];
+        [self.bgImgInfo.operationMatrix safetyAddObject:m];
+        [self.bgImgInfo calcCurrentMatrix];
+        
+        [self setNeedsDisplay];
+        return;
+    }
     
     if (self.annotationType == AnnotationTypeDraw)
     {
@@ -285,7 +325,14 @@
         
         [self setNeedsDisplay];
     }
-    
+    else if (self.annotationType == AnnotationTypeScale)
+    {
+        
+    }
+    else if (self.annotationType == AnnotationTypeErasure)
+    {
+        
+    }
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event
@@ -316,7 +363,9 @@
     //    [self.graphicsArray addObject:self.draggingInfo];
 }
 
-#pragma mark - 处理视图
+#pragma mark -
+
+#pragma mark - 处理事件
 - (void)cleanAllRect
 {
     self.draggingInfo = nil;
@@ -326,12 +375,29 @@
 
 - (void)clockwiseRatation
 {
-    
+    self.image = [self.image imageRotatedByDegrees:-90.0f];
+    NSArray <XMVector *> * realPoints = self.bgImgInfo.realPoints;
+    CGPoint p0 = [realPoints objectAtIndex:0].getVectorPoint;
+    CGPoint p2 = [realPoints objectAtIndex:2].getVectorPoint;
+    CGPoint originPoint = [self getMiddlePointByPoint:p0 other:p2];
+    XMMatrix * ratationM = [XMMatrix rotateMatrix:90.0f originPoint:originPoint];
+    [self.bgImgInfo.operationMatrix safetyAddObjectsFromArray:@[ratationM]];
+    [self.bgImgInfo calcCurrentMatrix];
+    [self setNeedsDisplay];
 }
+
 
 - (void)antiClockwiseRatation
 {
-    
+    self.image = [self.image imageRotatedByDegrees:90.0f];
+    NSArray <XMVector *> * realPoints = self.bgImgInfo.realPoints;
+    CGPoint p0 = [realPoints objectAtIndex:0].getVectorPoint;
+    CGPoint p2 = [realPoints objectAtIndex:2].getVectorPoint;
+    CGPoint originPoint = [self getMiddlePointByPoint:p0 other:p2];
+    XMMatrix * ratationM = [XMMatrix rotateMatrix:-90.0f originPoint:originPoint];
+    [self.bgImgInfo.operationMatrix safetyAddObjectsFromArray:@[ratationM]];
+    [self.bgImgInfo calcCurrentMatrix];
+    [self setNeedsDisplay];
 }
 
 - (void)hiddenAllRect
@@ -345,9 +411,9 @@
     UIGraphicsPopContext();
 }
 
-#pragma mark - 处理事件
 - (void)handleUp
-{}
+{
+}
 
 - (void)handleDown
 {}
@@ -387,7 +453,7 @@
     NSMutableArray * locateRectArray = [NSMutableArray array];
     for (XMAnnotationInfo * info in self.graphicsArray)
     {
-        NSArray <XMVector *> * realPoints = [info translatePointByOperation];
+        NSArray <XMVector *> * realPoints = info.realPoints;
         CGPoint p0 = [realPoints objectAtIndex:0].getVectorPoint;
         CGPoint p2 = [realPoints objectAtIndex:2].getVectorPoint;
         
@@ -411,7 +477,7 @@
     XMAnnotationInfo * locateInfo = [locateRectReverseArray safetyObjectAtIndex:0];
     for (XMAnnotationInfo * info0 in locateRectReverseArray)
     {
-        NSArray <XMVector *> * realPoints0 = [info0 translatePointByOperation];
+        NSArray <XMVector *> * realPoints0 = info0.realPoints;
         CGPoint p0_0 = [realPoints0 objectAtIndex:0].getVectorPoint;
         CGPoint p0_2 = [realPoints0 objectAtIndex:2].getVectorPoint;
         
@@ -423,7 +489,7 @@
                 continue;
             }
             
-            NSArray <XMVector *> * realPoints1 = [info1 translatePointByOperation];
+            NSArray <XMVector *> * realPoints1 = info1.realPoints;
             CGPoint p1_0 = [realPoints1 objectAtIndex:0].getVectorPoint;
             CGPoint p1_2 = [realPoints1 objectAtIndex:2].getVectorPoint;
             
@@ -459,9 +525,17 @@
     return rect1;
 }
 
+- (CGPoint)getMiddlePointByPoint:(CGPoint)point1 other:(CGPoint)point2
+{
+    CGPoint p = CGPointMake(MIN(point1.x , point2.x) + ABS(point1.x - point2.x) / 2.0,
+                            MIN(point1.y , point2.y) + ABS(point1.y - point2.y) / 2.0);
+    return p;
+}
+
 
 - (void)initCurrentBgInfo:(CGRect)rect
 {
+    self.image = [self.image imageRotatedByDegrees:180];
     CGFloat originImageWidth = self.image.size.width;
     CGFloat originImageHeight = self.image.size.height;
     CGFloat imageRatio = originImageWidth / originImageHeight;
@@ -514,5 +588,6 @@
     }
     return _bgImgInfo;
 }
+
 
 @end

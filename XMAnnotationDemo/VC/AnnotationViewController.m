@@ -9,7 +9,7 @@
 #import "AnnotationViewController.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 #import "XMAnnotationView.h"
-#import "UIImage+Utilitly.h"
+
 
 
 @interface AnnotationViewController ()
@@ -52,32 +52,6 @@
 }
 
 #pragma mark - Utilitly
-- (void)requestWebImg:(CGRect)rect
-{
-    self.originImage = [UIImage imageNamed:@"tupian"];
-//    CGFloat originImageWidth = self.originImage.size.width;
-//    CGFloat originImageHeight = self.originImage.size.height;
-//    CGFloat imageRatio = originImageWidth / originImageHeight;
-//    CGFloat viewRatio = rect.size.width / rect.size.height;
-//
-//    CGFloat imageWidth = 0,imageHeight = 0;
-//
-//    if (imageRatio > viewRatio) {
-//        imageWidth = rect.size.width;
-//        imageHeight = imageWidth / imageRatio;
-//    } else {
-//        imageHeight = rect.size.height;
-//        imageWidth = imageHeight * imageRatio;
-//    }
-//
-    CGSize size = rect.size;
-    UIImage * image = [self.originImage compressImageWithPointSize:size];
-//    UIImage
-    UIColor * c = [UIColor colorWithPatternImage:image];
-    [self.xmImageView setBackgroundColor:c];
-    
-    
-}
 
 
 
@@ -122,6 +96,7 @@
     [ratationClockwiseBtn setImage:[UIImage imageNamed:@"clockwise"] forState:UIControlStateNormal];
     [[ratationClockwiseBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(id x) {
         
+//        NSLog(@"len= %d", [self.xmImageView length]);
         [self.xmImageView clockwiseRatation];
     }];
     [self.view addSubview:ratationClockwiseBtn];
@@ -137,7 +112,7 @@
     [ratationAntiClockwiseBtn setTitle:@"逆时旋转" forState:UIControlStateNormal];
     [[ratationAntiClockwiseBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(id x) {
         
-        [self.xmImageView annotationMinWidth];
+        [self.xmImageView antiClockwiseRatation];
     }];
     [self.view addSubview:ratationAntiClockwiseBtn];
     [ratationAntiClockwiseBtn mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -341,7 +316,8 @@
     if (!_xmImageView)
     {
         _xmImageView = [[XMAnnotationView alloc] init];
-        _xmImageView.image = [UIImage imageNamed:@"coordinate"];
+        _xmImageView.image = [UIImage imageNamed:@"tupian1"];
+        _xmImageView.multipleTouchEnabled = YES;
         _xmImageView.annotationMinWidth = 10;
         _xmImageView.annotationMinHeight = 10;
     }

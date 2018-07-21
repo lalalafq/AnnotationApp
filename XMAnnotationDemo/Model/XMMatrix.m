@@ -18,26 +18,45 @@
 + (XMMatrix *)identityMatrix
 {
     static NSArray * identityArray;
-    identityArray = @[@1,@0,@0,@0,@1,@0,@0,@0,@1];
+    identityArray = @[@1,@0,@0,
+                      @0,@1,@0,
+                      @0,@0,@1];
     XMMatrix * identityMatrix = [[XMMatrix alloc] initWithArray:identityArray];
     return identityMatrix;
 }
 
 + (XMMatrix *)translateMatrixWithX:(int)dx withY:(int)dy
 {
-    NSArray * translateArray = @[@1,@0,@0,@0,@1,@0,@(dx),@(dy),@1];
+    NSArray * translateArray = @[@1,@0,@0,
+                                 @0,@1,@0,
+                                 @(dx),@(dy),@1];
     XMMatrix * translateMatrix = [[XMMatrix alloc] initWithArray:translateArray];
     return translateMatrix;
 }
 
 + (XMMatrix *)rotateMatrix:(double)delta
 {
+    
     double radian = delta / 180 * M_PI;
-    NSArray * rotateArray = @[@(cos(radian)),@(sin(radian)),@0,
-                              @(-sin(radian)),@(cos(radian)),@0,
+    NSArray * rotateArray = @[@(cosf(radian)),@(sinf(radian)),@0,
+                              @(-sinf(radian)),@(cosf(radian)),@0,
                               @0,@0,@1];
     XMMatrix * rotateMatrix = [[XMMatrix alloc] initWithArray:rotateArray];
     return rotateMatrix;
+}
+
+
+// 以某个点做旋转 = 以原点旋转 + 转点的坐标
++ (XMMatrix *)rotateMatrix:(double)delta originPoint:(CGPoint)originPoint
+{
+    XMMatrix * translateMatrix1 = [XMMatrix translateMatrixWithX:-originPoint.x withY:-originPoint.y];
+    XMMatrix * rotateMatrix = [XMMatrix rotateMatrix:delta];
+    XMMatrix * translateMatrix2 = [XMMatrix translateMatrixWithX:originPoint.x withY:originPoint.y];
+    
+    XMMatrix * m = [XMCalculate multiplyMaxtrix:translateMatrix1 withMaxtrix:rotateMatrix];
+    XMMatrix * m2 = [XMCalculate multiplyMaxtrix:m withMaxtrix:translateMatrix2];
+    
+    return m2;
 }
 
 + (XMMatrix *)scaleMatrixWithX:(double)sx withY:(double)sy
