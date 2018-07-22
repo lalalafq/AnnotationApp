@@ -34,7 +34,7 @@
     if (self.thenMatrix)
     {
         XMMatrix * invertMatrix = [XMCalculate invertMatrix:self.thenMatrix];
-        totalMatrix = [XMCalculate multiplyMaxtrix:totalMatrix withMaxtrix:invertMatrix];
+        totalMatrix = [XMCalculate multiplyMaxtrix:invertMatrix withMaxtrix:totalMatrix];
     }
     for (XMVector * originPoint in self.originPoints)
     {

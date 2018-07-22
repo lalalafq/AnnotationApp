@@ -89,6 +89,7 @@
     CGContextSetLineCap(context, kCGLineCapSquare);
     CGContextSetLineJoin(context, kCGLineJoinMiter);
     
+    [self.bgImgInfo calcCurrentMatrix];
     /// 绘制之前的框
     for (XMAnnotationInfo * info in self.graphicsArray)
     {
@@ -295,7 +296,6 @@
     {
         [self.bgImgInfo.operationMatrix safetyRemoveObjectAtIndex:self.bgImgInfo.operationMatrix.count - 1];
         [self.bgImgInfo.operationMatrix safetyAddObject:m];
-        [self.bgImgInfo calcCurrentMatrix];
     }
 }
 
@@ -337,6 +337,7 @@
 {
     self.draggingInfo = nil;
     [self.graphicsArray removeAllObjects];
+    [self.bgImgInfo.operationMatrix removeAllObjects];
     [self setNeedsDisplay];
 }
 
@@ -349,21 +350,19 @@
     CGPoint originPoint = [self getMiddlePointByPoint:p0 other:p2];
     XMMatrix * ratationM = [XMMatrix rotateMatrix:90.0f originPoint:originPoint];
     [self.bgImgInfo.operationMatrix safetyAddObjectsFromArray:@[ratationM]];
-    [self.bgImgInfo calcCurrentMatrix];
     [self setNeedsDisplay];
 }
 
 
 - (void)antiClockwiseRatation
 {
-//    self.image = [self.image imageRotatedByDegrees:90.0f];
+    self.image = [self.image imageRotatedByDegrees:90.0f];
     NSArray <XMVector *> * realPoints = self.bgImgInfo.realPoints;
     CGPoint p0 = [realPoints objectAtIndex:0].getVectorPoint;
     CGPoint p2 = [realPoints objectAtIndex:2].getVectorPoint;
     CGPoint originPoint = [self getMiddlePointByPoint:p0 other:p2];
     XMMatrix * ratationM = [XMMatrix rotateMatrix:-90.0f originPoint:originPoint];
     [self.bgImgInfo.operationMatrix safetyAddObjectsFromArray:@[ratationM]];
-    [self.bgImgInfo calcCurrentMatrix];
     [self setNeedsDisplay];
 }
 
