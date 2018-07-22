@@ -23,6 +23,7 @@
 		C309808F20AD57ED00328B67 /* XMAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C309808E20AD57ED00328B67 /* XMAnnotationView.m */; };
 		C341727F20F7803A008F2954 /* UIImage+Utilitly.m in Sources */ = {isa = PBXBuildFile; fileRef = C341727E20F78039008F2954 /* UIImage+Utilitly.m */; };
 		C36E3D5A2102F0D2000C9975 /* UIImage+FixOrientation.m in Sources */ = {isa = PBXBuildFile; fileRef = C36E3D592102F0D2000C9975 /* UIImage+FixOrientation.m */; };
+		C36E3D5E210358D6000C9975 /* XMBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = C36E3D5D210358D6000C9975 /* XMBackgroundView.m */; };
 		C3D830BF20F8A4AB00671993 /* NSObject+Runtime.m in Sources */ = {isa = PBXBuildFile; fileRef = C3D830BE20F8A4AB00671993 /* NSObject+Runtime.m */; };
 		C3D830C220F9C53600671993 /* NSArray+Safety.m in Sources */ = {isa = PBXBuildFile; fileRef = C3D830C120F9C53600671993 /* NSArray+Safety.m */; };
 		C3D830CB20FAE58500671993 /* NSString+RectSize.m in Sources */ = {isa = PBXBuildFile; fileRef = C3D830C920FAE58500671993 /* NSString+RectSize.m */; };
@@ -83,6 +84,8 @@
 		C341727E20F78039008F2954 /* UIImage+Utilitly.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Utilitly.m"; sourceTree = "<group>"; };
 		C36E3D582102F0D2000C9975 /* UIImage+FixOrientation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+FixOrientation.h"; sourceTree = "<group>"; };
 		C36E3D592102F0D2000C9975 /* UIImage+FixOrientation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+FixOrientation.m"; sourceTree = "<group>"; };
+		C36E3D5C210358D6000C9975 /* XMBackgroundView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XMBackgroundView.h; sourceTree = "<group>"; };
+		C36E3D5D210358D6000C9975 /* XMBackgroundView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XMBackgroundView.m; sourceTree = "<group>"; };
 		C3D830BD20F8A4AB00671993 /* NSObject+Runtime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSObject+Runtime.h"; sourceTree = "<group>"; };
 		C3D830BE20F8A4AB00671993 /* NSObject+Runtime.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSObject+Runtime.m"; sourceTree = "<group>"; };
 		C3D830C020F9C53600671993 /* NSArray+Safety.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+Safety.h"; sourceTree = "<group>"; };
@@ -241,6 +244,8 @@
 			children = (
 				C309808D20AD57ED00328B67 /* XMAnnotationView.h */,
 				C309808E20AD57ED00328B67 /* XMAnnotationView.m */,
+				C36E3D5C210358D6000C9975 /* XMBackgroundView.h */,
+				C36E3D5D210358D6000C9975 /* XMBackgroundView.m */,
 			);
 			path = Component;
 			sourceTree = "<group>";
@@ -517,6 +522,7 @@
 				C309808920AD156A00328B67 /* JXNavigationController.m in Sources */,
 				C309805E20AC2D7500328B67 /* main.m in Sources */,
 				C3D830CB20FAE58500671993 /* NSString+RectSize.m in Sources */,
+				C36E3D5E210358D6000C9975 /* XMBackgroundView.m in Sources */,
 				C36E3D5A2102F0D2000C9975 /* UIImage+FixOrientation.m in Sources */,
 				C3D830C220F9C53600671993 /* NSArray+Safety.m in Sources */,
 				C309805020AC2D7500328B67 /* AppDelegate.m in Sources */,

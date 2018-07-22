@@ -16,8 +16,7 @@ typedef enum : NSUInteger {
     AnnotationTypeErasure
 } AnnotationType;
 
-@interface XMAnnotationView : UIView
-
+@interface XMAnnotationView : UIView;
 
 @property (nonatomic,strong)UIImage * image;
 
@@ -42,7 +41,5 @@ typedef enum : NSUInteger {
 - (void)handleLeft;
 - (void)handleRight;
 - (void)handleBlank;
-
-- (void)length;
 
 @end

@@ -34,17 +34,19 @@
 
 @implementation XMAnnotationView
 
+
+
 - (void)drawRect:(CGRect)rect {
     
     NSLog(@"*******************drawRect*******************");
     [super drawRect:rect];
-    
     
     CGContextRef context = UIGraphicsGetCurrentContext();
     _cxt = context;
     UIGraphicsBeginImageContext(self.bounds.size);
     /// 画背景图
     [self drawBgImg:context andRect:rect];
+
     
     if (!self.hiddenAllRectFlag)
     {
@@ -55,8 +57,10 @@
     UIGraphicsEndImageContext();
 }
 
+// 画背景图
 - (void)drawBgImg:(CGContextRef)context andRect:(CGRect)rect
 {
+//    return;
     if (self.bgImgInfo.originPoints.count < 4)
     {
         [self initCurrentBgInfo:rect];
@@ -73,10 +77,10 @@
     //需要将CGLayerContext来作为缓存context，这个是必须的
     CGContextRef layerContext = CGLayerGetContext(cg);
     CGContextDrawImage(layerContext, imageRect, self.image.CGImage);
-//    [self.image drawInRect:imageRect];
     CGContextDrawLayerAtPoint(context, CGPointMake(0, 0), cg);
 }
 
+// 画框
 - (void)drawCustomRect:(CGContextRef)context
 {
     //设置相关参数
@@ -128,13 +132,6 @@
     XMVector * pointVector = [[XMVector alloc] initWithPoint:touchPoint];
     NSLog(@"*******************触碰开始*******************%@:%@",NSStringFromCGPoint(touchPoint),@(touches.count));
     
-    if (touches.count == 2)
-    {
-        self.draggingOriginPoint = touchPoint;
-        return;
-    }
-    
-    
     //
     if (self.annotationType == AnnotationTypeDraw)
     {
@@ -178,27 +175,7 @@
 {
     UITouch *touch = [touches anyObject];
     CGPoint touchPoint = [touch locationInView:self];
-    XMVector * pointVector = [[XMVector alloc] initWithPoint:touchPoint];
     NSLog(@"*******************触碰移动*******************%@:%@",NSStringFromCGPoint(touchPoint),@(touches.count));
-    
-    if (touches.count == 2)
-    {
-        CGFloat dx = touchPoint.x - self.draggingOriginPoint.x;
-        CGFloat dy = touchPoint.y - self.draggingOriginPoint.y;
-        CGFloat diagonal = sqrt(dx*dx + dy*dy);
-        CGFloat sWidth = [[UIScreen mainScreen] bounds].size.width;
-        CGFloat sHeight = [[UIScreen mainScreen] bounds].size.height;
-        CGFloat screenDiagonal = sqrt(sWidth*sWidth + sHeight*sHeight);
-        CGFloat scale = diagonal / screenDiagonal;
-        
-        XMMatrix * m = [XMMatrix scaleMatrixWithX:scale withY:scale];
-        [self.bgImgInfo.operationMatrix safetyRemoveObjectAtIndex:self.bgImgInfo.operationMatrix.count - 1];
-        [self.bgImgInfo.operationMatrix safetyAddObject:m];
-        [self.bgImgInfo calcCurrentMatrix];
-        
-        [self setNeedsDisplay];
-        return;
-    }
     
     if (self.annotationType == AnnotationTypeDraw)
     {
@@ -210,42 +187,13 @@
         {
             [self.draggingInfo.originPoints removeObjectsInRange:NSMakeRange(1, self.draggingInfo.originPoints.count - 2)];
         }
-        XMVector * v0 = [self.draggingInfo.originPoints objectAtIndex:0];
-        CGPoint p0 = v0.getVectorPoint;
-        CGPoint p2 = pointVector.getVectorPoint;
-        CGPoint p1 = CGPointMake(p0.x, p2.y);
-        CGPoint p3 = CGPointMake(p2.x, p0.y);
-        XMVector * v1 = [[XMVector alloc] initWithPoint:p1];
-        XMVector * v2 = [[XMVector alloc] initWithPoint:p2];
-        XMVector * v3 = [[XMVector alloc] initWithPoint:p3];
-        [self.draggingInfo.originPoints removeAllObjects];
-        [self.draggingInfo.originPoints addObjectsFromArray:@[v0,v1,v2,v3]];
         
+        [self touchMoveForTypeDraw:touchPoint];
         [self setNeedsDisplay];
     }
     else if (self.annotationType == AnnotationTypeMove)
     {
-        if (CGPointEqualToPoint(self.draggingOriginPoint, CGPointZero))
-        {
-            return;
-        }
-        NSLog(@"----------------移动移动------------------");
-        CGFloat dx = touchPoint.x - self.draggingOriginPoint.x;
-        CGFloat dy = touchPoint.y - self.draggingOriginPoint.y;
-        XMMatrix * m = [XMMatrix translateMatrixWithX:dx withY:dy];
-        NSLog(@"XMMatrix : %@",m);
-        if (self.draggingInfo)
-        {
-            [self.draggingInfo.operationMatrix safetyRemoveObjectAtIndex:self.draggingInfo.operationMatrix.count - 1];
-            [self.draggingInfo.operationMatrix safetyAddObject:m];
-        }
-        else
-        {
-            [self.bgImgInfo.operationMatrix safetyRemoveObjectAtIndex:self.bgImgInfo.operationMatrix.count - 1];
-            [self.bgImgInfo.operationMatrix safetyAddObject:m];
-            [self.bgImgInfo calcCurrentMatrix];
-        }
-        
+        [self touchMoveForTypeMove:touchPoint];
         [self setNeedsDisplay];
     }
 }
@@ -254,7 +202,6 @@
 {
     UITouch *touch = [touches anyObject];
     CGPoint touchPoint = [touch locationInView:self];
-    XMVector * pointVector = [[XMVector alloc] initWithPoint:touchPoint];
     NSLog(@"*******************触碰结束*******************%@",NSStringFromCGPoint(touchPoint));
     
     if (self.annotationType == AnnotationTypeDraw)
@@ -268,6 +215,7 @@
             [self.draggingInfo.originPoints removeObjectsInRange:NSMakeRange(1, self.draggingInfo.originPoints.count - 2)];
         }
         XMVector * v0 = [self.draggingInfo.originPoints objectAtIndex:0];
+        XMVector * pointVector = [[XMVector alloc] initWithPoint:touchPoint];
         CGPoint p0 = v0.getVectorPoint;
         CGPoint p2 = pointVector.getVectorPoint;
         if (CGPointEqualToPoint(p0,p2))
@@ -285,44 +233,13 @@
             [self setNeedsDisplay];
             return;
         }
-        CGPoint p1 = CGPointMake(p0.x, p2.y);
-        CGPoint p3 = CGPointMake(p2.x, p0.y);
-        XMVector * v1 = [[XMVector alloc] initWithPoint:p1];
-        XMVector * v2 = [[XMVector alloc] initWithPoint:p2];
-        XMVector * v3 = [[XMVector alloc] initWithPoint:p3];
-        [self.draggingInfo.originPoints removeAllObjects];
-        [self.draggingInfo.originPoints addObjectsFromArray:@[v0,v1,v2,v3]];
-        [self.graphicsArray addObject:self.draggingInfo];
-        
-        self.draggingInfo = nil;
-        
+        [self touchEndForTypeDraw:touchPoint];
         [self setNeedsDisplay];
     }
     else if (self.annotationType == AnnotationTypeMove)
     {
-        if (CGPointEqualToPoint(self.draggingOriginPoint, CGPointZero))
-        {
-            return;
-        }
         NSLog(@"----------------移动结束------------------");
-        CGFloat dx = touchPoint.x - self.draggingOriginPoint.x;
-        CGFloat dy = touchPoint.y - self.draggingOriginPoint.y;
-        XMMatrix * m = [XMMatrix translateMatrixWithX:dx withY:dy];
-        NSLog(@"XMMatrix : %@",m);
-        if (self.draggingInfo)
-        {
-            [self.draggingInfo.operationMatrix safetyRemoveObjectAtIndex:self.draggingInfo.operationMatrix.count - 1];
-            [self.draggingInfo.operationMatrix safetyAddObject:m];
-        }
-        else
-        {
-            [self.bgImgInfo.operationMatrix safetyRemoveObjectAtIndex:self.bgImgInfo.operationMatrix.count - 1];
-            [self.bgImgInfo.operationMatrix safetyAddObject:m];
-            [self.bgImgInfo calcCurrentMatrix];
-        }
-        
-        self.draggingOriginPoint = CGPointZero;
-        
+        [self touchMoveForTypeMove:touchPoint];
         [self setNeedsDisplay];
     }
     else if (self.annotationType == AnnotationTypeScale)
@@ -363,7 +280,57 @@
     //    [self.graphicsArray addObject:self.draggingInfo];
 }
 
-#pragma mark -
+#pragma mark - 从touch回调中重构的方法
+- (void)touchMoveForTypeMove:(CGPoint)touchPoint
+{
+    CGFloat dx = touchPoint.x - self.draggingOriginPoint.x;
+    CGFloat dy = touchPoint.y - self.draggingOriginPoint.y;
+    XMMatrix * m = [XMMatrix translateMatrixWithX:dx withY:dy];
+    if (self.draggingInfo)
+    {
+        [self.draggingInfo.operationMatrix safetyRemoveObjectAtIndex:self.draggingInfo.operationMatrix.count - 1];
+        [self.draggingInfo.operationMatrix safetyAddObject:m];
+    }
+    else
+    {
+        [self.bgImgInfo.operationMatrix safetyRemoveObjectAtIndex:self.bgImgInfo.operationMatrix.count - 1];
+        [self.bgImgInfo.operationMatrix safetyAddObject:m];
+        [self.bgImgInfo calcCurrentMatrix];
+    }
+}
+
+- (void)touchMoveForTypeDraw:(CGPoint)touchPoint
+{
+    XMVector * pointVector = [[XMVector alloc] initWithPoint:touchPoint];
+    XMVector * v0 = [self.draggingInfo.originPoints objectAtIndex:0];
+    CGPoint p0 = v0.getVectorPoint;
+    CGPoint p2 = pointVector.getVectorPoint;
+    CGPoint p1 = CGPointMake(p0.x, p2.y);
+    CGPoint p3 = CGPointMake(p2.x, p0.y);
+    XMVector * v1 = [[XMVector alloc] initWithPoint:p1];
+    XMVector * v2 = [[XMVector alloc] initWithPoint:p2];
+    XMVector * v3 = [[XMVector alloc] initWithPoint:p3];
+    [self.draggingInfo.originPoints removeAllObjects];
+    [self.draggingInfo.originPoints addObjectsFromArray:@[v0,v1,v2,v3]];
+}
+
+- (void)touchEndForTypeDraw:(CGPoint)touchPoint
+{
+    XMVector * pointVector = [[XMVector alloc] initWithPoint:touchPoint];
+    XMVector * v0 = [self.draggingInfo.originPoints objectAtIndex:0];
+    CGPoint p0 = v0.getVectorPoint;
+    CGPoint p2 = pointVector.getVectorPoint;
+    CGPoint p1 = CGPointMake(p0.x, p2.y);
+    CGPoint p3 = CGPointMake(p2.x, p0.y);
+    XMVector * v1 = [[XMVector alloc] initWithPoint:p1];
+    XMVector * v2 = [[XMVector alloc] initWithPoint:p2];
+    XMVector * v3 = [[XMVector alloc] initWithPoint:p3];
+    [self.draggingInfo.originPoints removeAllObjects];
+    [self.draggingInfo.originPoints addObjectsFromArray:@[v0,v1,v2,v3]];
+    [self.graphicsArray addObject:self.draggingInfo];
+    
+    self.draggingInfo = nil;
+}
 
 #pragma mark - 处理事件
 - (void)cleanAllRect
@@ -389,7 +356,7 @@
 
 - (void)antiClockwiseRatation
 {
-    self.image = [self.image imageRotatedByDegrees:90.0f];
+//    self.image = [self.image imageRotatedByDegrees:90.0f];
     NSArray <XMVector *> * realPoints = self.bgImgInfo.realPoints;
     CGPoint p0 = [realPoints objectAtIndex:0].getVectorPoint;
     CGPoint p2 = [realPoints objectAtIndex:2].getVectorPoint;
@@ -588,6 +555,7 @@
     }
     return _bgImgInfo;
 }
+
 
 
 @end

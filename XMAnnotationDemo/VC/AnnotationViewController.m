@@ -7,14 +7,15 @@
 //
 
 #import "AnnotationViewController.h"
-#import <SDWebImage/UIImageView+WebCache.h>
 #import "XMAnnotationView.h"
+#import "XMBackgroundView.h"
 
 
 
 @interface AnnotationViewController ()
 
 @property (nonatomic,strong)XMAnnotationView * xmImageView;
+@property (nonatomic,strong)XMBackgroundView * xmBgView;
 @property (nonatomic,strong)UIImage * originImage;
 
 
@@ -59,12 +60,21 @@
 - (void)setupUI
 {
     self.navigationItem.title = @"标注页面";
-    
     self.view.backgroundColor = [UIColor whiteColor];
+    
+//    [self.view addSubview:self.xmBgView];
+//    [self.xmBgView mas_makeConstraints:^(MASConstraintMaker *make) {
+//
+//        make.top.bottom.mas_equalTo(self.view);
+//        make.left.mas_equalTo(self.view).offset(100);
+//        make.right.mas_equalTo(self.view).offset(-100);
+//    }];
+    
     
     self.xmImageView.layer.borderWidth = 1.0;
     self.xmImageView.layer.borderColor = [UIColor redColor].CGColor;
     self.xmImageView.backgroundColor = [UIColor whiteColor];
+//    self.xmImageView.alpha = 0.0;
     self.xmImageView.userInteractionEnabled = YES;
     [self.view addSubview:self.xmImageView];
     [self.xmImageView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -77,6 +87,10 @@
     self.xmImageView.layer.borderWidth = 1.0;
     self.xmImageView.layer.masksToBounds = YES;
     
+
+    
+
+    /// 按钮控件
     UIButton * cleanBtn = [UIButton buttonWithType:UIButtonTypeSystem];
     [cleanBtn setTitle:@"清空" forState:UIControlStateNormal];
     [[cleanBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(id x) {
@@ -316,12 +330,32 @@
     if (!_xmImageView)
     {
         _xmImageView = [[XMAnnotationView alloc] init];
-        _xmImageView.image = [UIImage imageNamed:@"tupian1"];
+        _xmImageView.image = self.originImage;
         _xmImageView.multipleTouchEnabled = YES;
+        _xmImageView.userInteractionEnabled = YES;
         _xmImageView.annotationMinWidth = 10;
         _xmImageView.annotationMinHeight = 10;
     }
     return _xmImageView;
 }
 
+- (XMBackgroundView *)xmBgView
+{
+    if (!_xmBgView)
+    {
+        _xmBgView = [[XMBackgroundView alloc] init];
+        _xmBgView.image = self.originImage;
+        _xmBgView.contentMode = UIViewContentModeScaleAspectFit;
+    }
+    return _xmBgView;
+}
+
+- (UIImage *)originImage
+{
+    if (!_originImage)
+    {
+        _originImage = [UIImage imageNamed:@"tupian1"];
+    }
+    return _originImage;
+}
 @end
