@@ -20,20 +20,32 @@
 @property (nonatomic,strong)NSMutableArray <XMAnnotationInfo *> * graphicsArray;
 // 正在拖拽中的图形。
 @property (nonatomic,strong)XMAnnotationInfo * draggingInfo;
-// 正在拖拽的原始点。
+// 正在拖拽的原始点。(用于移动处理)
 @property (nonatomic)CGPoint draggingOriginPoint;
+// 正在缩放的原始矩形。(用于缩放处理)
+@property (nonatomic)CGRect zoomingOriginRect;
 // 当前图片的信息（把图片也当成一个标注样式）
 @property (nonatomic,strong)XMAnnotationInfo * bgImgInfo;
 //// 当前操作的矩阵变换
 //@property (nonatomic,strong)XMMatrix * currentOperationMatrix;
-
 /// 隐藏标志
 @property (nonatomic)BOOL hiddenAllRectFlag;
+
+@property (nonatomic)CGFloat screenDiagonalLength;
 
 @end
 
 @implementation XMAnnotationView
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self)
+    {
+        _screenDiagonalLength = [self getDiagonalLength:[UIScreen mainScreen].bounds];
+    }
+    return self;
+}
 
 
 - (void)drawRect:(CGRect)rect {
@@ -133,6 +145,7 @@
     XMVector * pointVector = [[XMVector alloc] initWithPoint:touchPoint];
     NSLog(@"*******************触碰开始*******************%@:%@",NSStringFromCGPoint(touchPoint),@(touches.count));
     
+    
     //
     if (self.annotationType == AnnotationTypeDraw)
     {
@@ -160,8 +173,16 @@
             [self.bgImgInfo.operationMatrix safetyAddObject:m];
         }
     }
-    else if (self.annotationType == AnnotationTypeScale)
+    else if (self.annotationType == AnnotationTypeZoom)
     {
+        if (touches.count == 2)
+        {
+            UITouch *touch1 = [[touches objectEnumerator] allObjects][0];
+            CGPoint touchPoint1 = [touch1 locationInView:self];
+            UITouch *touch2 = [[touches objectEnumerator] allObjects][1];
+            CGPoint touchPoint2 = [touch2 locationInView:self];
+            self.zoomingOriginRect = [self generateRectByPoint:touchPoint1 other:touchPoint2];
+        }
     }
     else if (self.annotationType == AnnotationTypeErasure)
     {
@@ -196,6 +217,32 @@
     {
         [self touchMoveForTypeMove:touchPoint];
         [self setNeedsDisplay];
+    }
+    else if (self.annotationType == AnnotationTypeZoom)
+    {
+        if (touches.count == 2)
+        {
+            
+            UITouch *touch1 = [[touches objectEnumerator] allObjects][0];
+            CGPoint touchPoint1 = [touch1 locationInView:self];
+            UITouch *touch2 = [[touches objectEnumerator] allObjects][1];
+            CGPoint touchPoint2 = [touch2 locationInView:self];
+            CGRect rect = [self generateRectByPoint:touchPoint1 other:touchPoint2];
+            if (CGRectEqualToRect(self.zoomingOriginRect, rect))
+            {
+                return;
+            }
+            CGFloat length = [self getDiagonalLength:rect];
+            CGFloat lastLength = [self getDiagonalLength:self.zoomingOriginRect];
+            CGFloat diff = length - lastLength;
+            CGFloat ratio = 1 + diff / self.screenDiagonalLength;
+            ratio = MIN(MAX(ratio, 0.8),3.0);
+            XMMatrix * zoomM = [XMMatrix scaleMatrixWithX:ratio withY:ratio];
+            [self.bgImgInfo.operationMatrix safetyAddObjectsFromArray:@[zoomM]];
+            [self setNeedsDisplay];
+            
+            self.zoomingOriginRect = rect;
+        }
     }
 }
 
@@ -243,7 +290,7 @@
         [self touchMoveForTypeMove:touchPoint];
         [self setNeedsDisplay];
     }
-    else if (self.annotationType == AnnotationTypeScale)
+    else if (self.annotationType == AnnotationTypeZoom)
     {
         
     }
@@ -391,29 +438,11 @@
 {}
 
 - (void)handleBlank
-{}
+{
+    [self setNeedsDisplay];
+}
 
 #pragma mark - Utilily
-- (BOOL)checkMinSize:(CGPoint)point1 other:(CGPoint)point2
-{
-    CGFloat width = ABS(point1.x - point2.x);
-    CGFloat height = ABS(point1.y - point2.y);
-    if (width < self.annotationMinWidth && height < self.annotationMinHeight)
-    {
-        return NO;
-    }
-    return YES;
-}
-
-- (BOOL)checkPointEqual:(CGPoint)point1 other:(CGPoint)point2
-{
-    if (point1.x == point2.x && point1.y == point2.y)
-    {
-        return YES;
-    }
-    return NO;
-}
-
 - (BOOL)findLocateRect:(CGPoint)p
 {
     NSMutableArray * locateRectArray = [NSMutableArray array];
@@ -482,23 +511,6 @@
     return YES;
 }
 
-- (CGRect)generateRectByPoint:(CGPoint)point1 other:(CGPoint)point2
-{
-    CGRect rect1 = CGRectMake(MIN(point1.x , point2.x),
-                              MIN(point1.y , point2.y),
-                              ABS(point1.x - point2.x),
-                              ABS(point1.y - point2.y));
-    return rect1;
-}
-
-- (CGPoint)getMiddlePointByPoint:(CGPoint)point1 other:(CGPoint)point2
-{
-    CGPoint p = CGPointMake(MIN(point1.x , point2.x) + ABS(point1.x - point2.x) / 2.0,
-                            MIN(point1.y , point2.y) + ABS(point1.y - point2.y) / 2.0);
-    return p;
-}
-
-
 - (void)initCurrentBgInfo:(CGRect)rect
 {
     self.image = [self.image imageRotatedByDegrees:180];
@@ -533,6 +545,48 @@
     XMVector * v3 = [[XMVector alloc] initWithPoint:point3];
     
     [_bgImgInfo.originPoints safetyAddObjectsFromArray:@[v0,v1,v2,v3]];
+}
+
+- (BOOL)checkMinSize:(CGPoint)point1 other:(CGPoint)point2
+{
+    CGFloat width = ABS(point1.x - point2.x);
+    CGFloat height = ABS(point1.y - point2.y);
+    if (width < self.annotationMinWidth && height < self.annotationMinHeight)
+    {
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)checkPointEqual:(CGPoint)point1 other:(CGPoint)point2
+{
+    if (point1.x == point2.x && point1.y == point2.y)
+    {
+        return YES;
+    }
+    return NO;
+}
+
+- (CGRect)generateRectByPoint:(CGPoint)point1 other:(CGPoint)point2
+{
+    CGRect rect1 = CGRectMake(MIN(point1.x , point2.x),
+                              MIN(point1.y , point2.y),
+                              ABS(point1.x - point2.x),
+                              ABS(point1.y - point2.y));
+    return rect1;
+}
+
+- (CGPoint)getMiddlePointByPoint:(CGPoint)point1 other:(CGPoint)point2
+{
+    CGPoint p = CGPointMake(MIN(point1.x , point2.x) + ABS(point1.x - point2.x) / 2.0,
+                            MIN(point1.y , point2.y) + ABS(point1.y - point2.y) / 2.0);
+    return p;
+}
+
+- (CGFloat)getDiagonalLength:(CGRect)rect
+{
+    CGFloat length = sqrt(rect.size.width * rect.size.width + rect.size.height * rect.size.height);
+    return length;
 }
 
 

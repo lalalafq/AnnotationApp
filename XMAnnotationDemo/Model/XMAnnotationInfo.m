@@ -19,7 +19,7 @@
         self.realPoints = self.originPoints;
     }
     NSMutableArray * realPointArray = [NSMutableArray array];
-    XMMatrix * totalMatrix = [XMMatrix identityMatrix];
+    XMMatrix * totalMatrix = self.operationMatrix.count > 0 ? [self.operationMatrix firstObject] : [XMMatrix identityMatrix];
     /// 首先计算所有的操作矩阵积
     for (XMMatrix * m in self.operationMatrix)
     {

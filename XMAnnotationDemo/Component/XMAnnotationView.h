@@ -12,7 +12,7 @@
 typedef enum : NSUInteger {
     AnnotationTypeDraw,
     AnnotationTypeMove,
-    AnnotationTypeScale,
+    AnnotationTypeZoom,
     AnnotationTypeErasure
 } AnnotationType;
 

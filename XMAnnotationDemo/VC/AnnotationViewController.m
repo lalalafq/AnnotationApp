@@ -201,7 +201,7 @@
     [annTypeScaleBtn setTitle:@"缩放" forState:UIControlStateNormal];
     [[annTypeScaleBtn rac_signalForControlEvents:UIControlEventTouchUpInside] subscribeNext:^(id x) {
         
-        self.xmImageView.annotationType = AnnotationTypeScale;
+        self.xmImageView.annotationType = AnnotationTypeZoom;
     }];
     [self.view addSubview:annTypeScaleBtn];
     [annTypeScaleBtn mas_makeConstraints:^(MASConstraintMaker *make) {
